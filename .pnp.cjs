@@ -35,6 +35,7 @@ const RAW_RUNTIME_STATE =
           ["@vitejs/plugin-vue", "virtual:f5bebc92e75e0a1d18edad77d1f0f1a4071b1ae57d0c99a6a212b844d9588f3be7274b697b8b45d8047237bf71d473a3934e08db2757b3f661ae4e8cc5b2d94d#npm:6.0.6"],\
           ["@vue/tsconfig", "virtual:f5bebc92e75e0a1d18edad77d1f0f1a4071b1ae57d0c99a6a212b844d9588f3be7274b697b8b45d8047237bf71d473a3934e08db2757b3f661ae4e8cc5b2d94d#npm:0.9.1"],\
           ["calorie-counter", "workspace:."],\
+          ["fuse.js", "npm:7.3.0"],\
           ["npm-run-all2", "npm:8.0.4"],\
           ["pinia", "virtual:f5bebc92e75e0a1d18edad77d1f0f1a4071b1ae57d0c99a6a212b844d9588f3be7274b697b8b45d8047237bf71d473a3934e08db2757b3f661ae4e8cc5b2d94d#npm:3.0.4"],\
           ["typescript", "patch:typescript@npm%3A6.0.2#optional!builtin<compat/typescript>::version=6.0.2&hash=5786d5"],\
@@ -980,21 +981,13 @@ const RAW_RUNTIME_STATE =
           ["undici-types", "npm:7.16.0"]\
         ],\
         "linkType": "HARD"\
-      }],\
-      ["npm:25.6.0", {\
-        "packageLocation": "../../../.yarn/berry/cache/@types-node-npm-25.6.0-429799b5e8-10c0.zip/node_modules/@types/node/",\
-        "packageDependencies": [\
-          ["@types/node", "npm:25.6.0"],\
-          ["undici-types", "npm:7.19.2"]\
-        ],\
-        "linkType": "HARD"\
       }]\
     ]],\
     ["@types/ws", [\
       ["npm:8.18.1", {\
         "packageLocation": "../../../.yarn/berry/cache/@types-ws-npm-8.18.1-61dc106ff0-10c0.zip/node_modules/@types/ws/",\
         "packageDependencies": [\
-          ["@types/node", "npm:25.6.0"],\
+          ["@types/node", "npm:24.12.2"],\
           ["@types/ws", "npm:8.18.1"]\
         ],\
         "linkType": "HARD"\
@@ -1568,6 +1561,7 @@ const RAW_RUNTIME_STATE =
           ["@vitejs/plugin-vue", "virtual:f5bebc92e75e0a1d18edad77d1f0f1a4071b1ae57d0c99a6a212b844d9588f3be7274b697b8b45d8047237bf71d473a3934e08db2757b3f661ae4e8cc5b2d94d#npm:6.0.6"],\
           ["@vue/tsconfig", "virtual:f5bebc92e75e0a1d18edad77d1f0f1a4071b1ae57d0c99a6a212b844d9588f3be7274b697b8b45d8047237bf71d473a3934e08db2757b3f661ae4e8cc5b2d94d#npm:0.9.1"],\
           ["calorie-counter", "workspace:."],\
+          ["fuse.js", "npm:7.3.0"],\
           ["npm-run-all2", "npm:8.0.4"],\
           ["pinia", "virtual:f5bebc92e75e0a1d18edad77d1f0f1a4071b1ae57d0c99a6a212b844d9588f3be7274b697b8b45d8047237bf71d473a3934e08db2757b3f661ae4e8cc5b2d94d#npm:3.0.4"],\
           ["typescript", "patch:typescript@npm%3A6.0.2#optional!builtin<compat/typescript>::version=6.0.2&hash=5786d5"],\
@@ -1835,6 +1829,15 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["fsevents", "patch:fsevents@npm%3A2.3.3#optional!builtin<compat/fsevents>::version=2.3.3&hash=df0bf1"],\
           ["node-gyp", "npm:12.2.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["fuse.js", [\
+      ["npm:7.3.0", {\
+        "packageLocation": "../../../.yarn/berry/cache/fuse.js-npm-7.3.0-bc3e90fa3c-10c0.zip/node_modules/fuse.js/",\
+        "packageDependencies": [\
+          ["fuse.js", "npm:7.3.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -2928,13 +2931,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../.yarn/berry/cache/undici-types-npm-7.16.0-0e23b08124-10c0.zip/node_modules/undici-types/",\
         "packageDependencies": [\
           ["undici-types", "npm:7.16.0"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
-      ["npm:7.19.2", {\
-        "packageLocation": "../../../.yarn/berry/cache/undici-types-npm-7.19.2-93c792b6dd-10c0.zip/node_modules/undici-types/",\
-        "packageDependencies": [\
-          ["undici-types", "npm:7.19.2"]\
         ],\
         "linkType": "HARD"\
       }]\
