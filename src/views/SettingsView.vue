@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { useProfileStore } from '@/stores/profile'
 import { useLogStore } from '@/stores/log'
 import { useTagsStore } from '@/stores/tags'
 
+const router = useRouter()
 const profileStore = useProfileStore()
 const logStore = useLogStore()
 const tagsStore = useTagsStore()
@@ -125,6 +127,13 @@ onMounted(() => Promise.all([profileStore.fetchProfile(), tagsStore.fetchTags()]
         </button>
       </form>
       <p v-if="tagError" class="form-error" style="margin-top: 8px;">{{ tagError }}</p>
+    </div>
+
+    <!-- History -->
+    <div class="card">
+      <h2>History</h2>
+      <p class="muted" style="margin-bottom: 14px;">View your past days' calorie logs.</p>
+      <button class="btn btn-secondary" @click="router.push('/history')">View history</button>
     </div>
 
     <!-- Danger zone -->

@@ -19,7 +19,6 @@ async function logout() {
     <div class="navbar-links">
       <router-link to="/">Today</router-link>
       <router-link to="/food">Food</router-link>
-      <router-link to="/history">History</router-link>
       <router-link to="/settings">Settings</router-link>
       <button class="btn-link" @click="logout">Sign out</button>
     </div>
