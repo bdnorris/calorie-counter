@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, onBeforeUnmount } from 'vue'
+import Fuse from 'fuse.js'
 import { useMealsStore } from '@/stores/meals'
 import { useTagsStore } from '@/stores/tags'
 import type { Meal } from '@/types'
@@ -15,13 +16,39 @@ const mealsStore = useMealsStore()
 const tagsStore = useTagsStore()
 
 const activeTagId = ref<string | null>(null)
+const query = ref('')
 const selectedMeal = ref<Meal | null>(null)
 const grams = ref<number | null>(null)
 const adding = ref(false)
+const searchInput = ref<HTMLInputElement | null>(null)
 
-const filteredMeals = computed(() => {
+// Tag filter → then fuzzy search on top
+const tagFiltered = computed(() => {
   if (!activeTagId.value) return mealsStore.meals
   return mealsStore.meals.filter(m => m.tags.some(t => t.id === activeTagId.value))
+})
+
+const fuse = computed(() => new Fuse(tagFiltered.value, {
+  keys: [
+    { name: 'name', weight: 2 },
+    { name: 'tags.name', weight: 1 },
+  ],
+  threshold: 0.35,
+  minMatchCharLength: 1,
+}))
+
+const visibleMeals = computed(() => {
+  const q = query.value.trim()
+  if (!q) return tagFiltered.value
+  return fuse.value.search(q).map(r => r.item)
+})
+
+const emptyMessage = computed(() => {
+  if (mealsStore.meals.length === 0) return 'No food items yet. Add some in the Food section.'
+  if (visibleMeals.value.length === 0) {
+    return query.value.trim() ? `No results for "${query.value.trim()}".` : 'No items match this tag.'
+  }
+  return null
 })
 
 const calculatedCalories = computed<number | null>(() => {
@@ -85,9 +112,11 @@ watch(() => props.modelValue, (open) => {
   if (open) {
     clearSelection()
     activeTagId.value = null
+    query.value = ''
     if (!mealsStore.meals.length) mealsStore.fetchMeals()
     if (!tagsStore.tags.length) tagsStore.fetchTags()
     document.body.style.overflow = 'hidden'
+    nextTick(() => searchInput.value?.focus())
   } else {
     document.body.style.overflow = ''
   }
@@ -109,6 +138,20 @@ watch(() => props.modelValue, (open) => {
           <button class="btn-close" @click="close" aria-label="Close">✕</button>
         </div>
 
+        <!-- Search -->
+        <div class="offcanvas-search">
+          <div class="search-wrap">
+            <input
+              ref="searchInput"
+              v-model="query"
+              type="search"
+              class="search-input"
+              placeholder="Search food..."
+              autocomplete="off"
+            />
+          </div>
+        </div>
+
         <!-- Tag filter -->
         <div v-if="tagsStore.tags.length" class="offcanvas-filter">
           <button
@@ -126,15 +169,10 @@ watch(() => props.modelValue, (open) => {
         <!-- Food list -->
         <div class="offcanvas-body">
           <div v-if="mealsStore.loading" class="muted picker-empty">Loading...</div>
-          <div v-else-if="mealsStore.meals.length === 0" class="muted picker-empty">
-            No food items yet. Add some in the Food section.
-          </div>
-          <div v-else-if="filteredMeals.length === 0" class="muted picker-empty">
-            No items match this tag.
-          </div>
+          <div v-else-if="emptyMessage" class="muted picker-empty">{{ emptyMessage }}</div>
           <ul v-else class="picker-list">
             <li
-              v-for="meal in filteredMeals"
+              v-for="meal in visibleMeals"
               :key="meal.id"
               :class="['picker-item', selectedMeal?.id === meal.id && 'picker-item--selected']"
               @click="selectMeal(meal)"

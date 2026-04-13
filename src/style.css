@@ -631,6 +631,62 @@ main.with-nav { padding-top: 56px; }
 .offcanvas-slide-enter-from,
 .offcanvas-slide-leave-to     { transform: translateX(100%); }
 
+/* ── Search input ────────────────────────────────────────── */
+.search-wrap { position: relative; }
+
+.search-wrap::before {
+  content: '';
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--color-muted);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.search-wrap::after {
+  content: '';
+  position: absolute;
+  left: 22px;
+  top: calc(50% + 4px);
+  width: 5px;
+  height: 2px;
+  background: var(--color-muted);
+  border-radius: 1px;
+  transform: rotate(45deg);
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 9px 12px 9px 34px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  transition: border-color .15s;
+  /* remove browser default clear button styling */
+  -webkit-appearance: none;
+}
+.search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(44, 122, 75, .15);
+}
+.search-input::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+/* Inside the off-canvas panel */
+.offcanvas-search {
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
 /* ── Utilities ───────────────────────────────────────────── */
 .muted { color: var(--color-muted); font-size: 0.875rem; }
 

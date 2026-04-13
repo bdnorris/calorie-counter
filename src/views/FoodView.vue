@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
+import Fuse from 'fuse.js'
 import { useMealsStore } from '@/stores/meals'
 import { useTagsStore } from '@/stores/tags'
 import type { Meal } from '@/types'
@@ -7,12 +8,37 @@ import type { Meal } from '@/types'
 const mealsStore = useMealsStore()
 const tagsStore = useTagsStore()
 
-// ── Filter ───────────────────────────────────────────────────
+// ── Filter + search ──────────────────────────────────────────
 const activeTagId = ref<string | null>(null)
+const query = ref('')
 
-const filteredMeals = computed(() => {
+const tagFiltered = computed(() => {
   if (!activeTagId.value) return mealsStore.meals
   return mealsStore.meals.filter(m => m.tags.some(t => t.id === activeTagId.value))
+})
+
+const fuse = computed(() => new Fuse(tagFiltered.value, {
+  keys: [
+    { name: 'name', weight: 2 },
+    { name: 'tags.name', weight: 1 },
+  ],
+  threshold: 0.35,
+  minMatchCharLength: 1,
+}))
+
+const visibleMeals = computed(() => {
+  const q = query.value.trim()
+  if (!q) return tagFiltered.value
+  return fuse.value.search(q).map(r => r.item)
+})
+
+const emptyMessage = computed(() => {
+  if (mealsStore.loading) return null
+  if (mealsStore.meals.length === 0) return 'No items yet. Add one above.'
+  if (visibleMeals.value.length === 0) {
+    return query.value.trim() ? `No results for "${query.value.trim()}".` : 'No items match this tag.'
+  }
+  return null
 })
 
 // ── Meal form ─────────────────────────────────────────────────
@@ -112,6 +138,17 @@ onMounted(() => Promise.all([mealsStore.fetchMeals(), tagsStore.fetchTags()]))
       <button class="btn btn-primary" @click="openCreate">+ Add item</button>
     </div>
 
+    <!-- Search -->
+    <div class="search-wrap">
+      <input
+        v-model="query"
+        type="search"
+        class="search-input"
+        placeholder="Search food..."
+        autocomplete="off"
+      />
+    </div>
+
     <!-- Tag filter pills -->
     <div v-if="tagsStore.tags.length" class="tag-filter">
       <button
@@ -196,11 +233,9 @@ onMounted(() => Promise.all([mealsStore.fetchMeals(), tagsStore.fetchTags()]))
 
     <!-- Food list -->
     <div v-if="mealsStore.loading" class="muted">Loading...</div>
-    <div v-else-if="filteredMeals.length === 0 && !showForm" class="card muted">
-      {{ mealsStore.meals.length === 0 ? 'No items yet. Add one above.' : 'No items match this tag.' }}
-    </div>
+    <div v-else-if="emptyMessage && !showForm" class="card muted">{{ emptyMessage }}</div>
     <ul v-else class="meal-list">
-      <li v-for="meal in filteredMeals" :key="meal.id" class="meal-item card">
+      <li v-for="meal in visibleMeals" :key="meal.id" class="meal-item card">
         <div class="meal-info">
           <span class="meal-name">{{ meal.name }}</span>
           <span class="meal-detail muted">
