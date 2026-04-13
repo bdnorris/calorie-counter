@@ -1,42 +1,71 @@
-# .
+# Calorie Counter
 
-This template should help get you started developing with Vue 3 in Vite.
+A personal calorie tracking app built with Vue 3, Supabase, and Netlify Functions.
 
-## Recommended IDE Setup
+## User management
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+There is no self-service registration. Users must be created manually in the Supabase dashboard:
 
-## Recommended Browser Setup
+1. Go to your Supabase project → **Authentication** → **Users**
+2. Click **Add user** → **Create new user**
+3. Enter the user's email and a password
+4. Make sure **"Auto Confirm User"** is checked (or email confirmation is disabled — see below)
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+### Disable email confirmation
 
-## Type Support for `.vue` Imports in TS
+Since users are created manually, email confirmation should be turned off:
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+1. Go to **Authentication** → **Providers** → **Email**
+2. Toggle off **"Confirm email"**
+3. Save
 
-## Customize configuration
+## Setup
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+### 1. Supabase
 
-## Project Setup
+- Create a Supabase project
+- Run `supabase-schema.sql` in the Supabase **SQL Editor**
+- Disable email confirmation (see above)
 
-```sh
-yarn
+### 2. Environment variables
+
+Copy `.env.example` to `.env.local` and fill in your Supabase keys:
+
+```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+SUPABASE_URL=...
+SUPABASE_SERVICE_KEY=...
 ```
 
-### Compile and Hot-Reload for Development
+Add the same four variables to your **Netlify site → Environment variables**.
+
+### 3. Local development
+
+Install [Netlify CLI](https://docs.netlify.com/cli/get-started/) globally if you haven't:
 
 ```sh
-yarn dev
+npm install -g netlify-cli
 ```
 
-### Type-Check, Compile and Minify for Production
+Link to your Netlify site:
 
 ```sh
-yarn build
+netlify link
+```
+
+Start the dev server (runs Vite + Netlify Functions together on port 8888):
+
+```sh
+netlify dev
+```
+
+### 4. Deploy
+
+Push to your repository. Netlify will detect `netlify.toml` and build automatically.
+
+## Type-check
+
+```sh
+npm run type-check
 ```
