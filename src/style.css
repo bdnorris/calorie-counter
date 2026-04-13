@@ -76,6 +76,7 @@ main.with-nav { padding-top: 56px; }
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--color-primary);
+	line-height: 1.1;
 }
 
 .navbar-links {

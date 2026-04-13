@@ -6,6 +6,15 @@ import { useProfileStore } from '@/stores/profile'
 const logStore = useLogStore()
 const profileStore = useProfileStore()
 
+async function clearHistory() {
+  if (!confirm("Clear all history? This deletes all past log entries and cannot be undone. Today's log will be kept.")) return
+  try {
+    await logStore.clearHistory()
+  } catch (e) {
+    alert(e instanceof Error ? e.message : 'Failed to clear history')
+  }
+}
+
 function formatDate(dateStr: string) {
   const parts = dateStr.split('-').map(Number)
   return new Date(parts[0]!, parts[1]! - 1, parts[2]!).toLocaleDateString(undefined, {
@@ -37,11 +46,12 @@ onMounted(async () => {
 
     <div v-if="logStore.historyLoading" class="muted">Loading...</div>
 
-    <div v-else-if="logStore.history.length === 0" class="card muted">
-      No history yet. Past days will appear here.
-    </div>
+    <template v-else>
+      <div v-if="logStore.history.length === 0" class="card muted">
+        No history yet. Past days will appear here.
+      </div>
 
-    <ul v-else class="history-list">
+      <ul v-else class="history-list">
       <li v-for="day in logStore.history" :key="day.log_date" class="history-item card">
         <div class="history-date">{{ formatDate(day.log_date) }}</div>
         <div class="history-stats">
@@ -56,6 +66,13 @@ onMounted(async () => {
           <span class="muted history-entries">{{ day.entry_count }} entries</span>
         </div>
       </li>
-    </ul>
+      </ul>
+
+      <div v-if="logStore.history.length > 0" class="card danger-zone">
+        <h2>Danger zone</h2>
+        <p class="muted">Clears all past days from your history. Today's log is not affected.</p>
+        <button class="btn btn-danger" @click="clearHistory">Clear history</button>
+      </div>
+    </template>
   </div>
 </template>

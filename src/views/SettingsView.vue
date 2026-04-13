@@ -2,12 +2,10 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useProfileStore } from '@/stores/profile'
-import { useLogStore } from '@/stores/log'
 import { useTagsStore } from '@/stores/tags'
 
 const router = useRouter()
 const profileStore = useProfileStore()
-const logStore = useLogStore()
 const tagsStore = useTagsStore()
 
 // ── Daily goal ────────────────────────────────────────────────
@@ -68,17 +66,6 @@ async function deleteTag(id: string, name: string) {
   }
 }
 
-// ── History ───────────────────────────────────────────────────
-async function clearHistory() {
-  if (!confirm("Clear all history? This deletes all past log entries and cannot be undone. Today's log will be kept.")) return
-  try {
-    await logStore.clearHistory()
-    alert('History cleared.')
-  } catch (e) {
-    alert(e instanceof Error ? e.message : 'Failed to clear history')
-  }
-}
-
 onMounted(() => Promise.all([profileStore.fetchProfile(), tagsStore.fetchTags()]))
 </script>
 
@@ -136,11 +123,5 @@ onMounted(() => Promise.all([profileStore.fetchProfile(), tagsStore.fetchTags()]
       <button class="btn btn-secondary" @click="router.push('/history')">View history</button>
     </div>
 
-    <!-- Danger zone -->
-    <div class="card danger-zone">
-      <h2>Danger zone</h2>
-      <p class="muted">Clears all past days from your history. Today's log is not affected.</p>
-      <button class="btn btn-danger" @click="clearHistory">Clear history</button>
-    </div>
   </div>
 </template>
