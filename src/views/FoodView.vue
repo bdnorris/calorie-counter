@@ -1,10 +1,21 @@
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useMealsStore } from '@/stores/meals'
+import { useTagsStore } from '@/stores/tags'
 import type { Meal } from '@/types'
 
 const mealsStore = useMealsStore()
+const tagsStore = useTagsStore()
 
+// ── Filter ───────────────────────────────────────────────────
+const activeTagId = ref<string | null>(null)
+
+const filteredMeals = computed(() => {
+  if (!activeTagId.value) return mealsStore.meals
+  return mealsStore.meals.filter(m => m.tags.some(t => t.id === activeTagId.value))
+})
+
+// ── Meal form ─────────────────────────────────────────────────
 type MealForm = {
   name: string
   calorie_type: 'per_gram' | 'flat'
@@ -19,12 +30,14 @@ function emptyForm(): MealForm {
 const showForm = ref(false)
 const editingId = ref<string | null>(null)
 const form = reactive<MealForm>(emptyForm())
+const selectedTagIds = ref<string[]>([])
 const formError = ref('')
 const submitting = ref(false)
 
 function openCreate() {
   editingId.value = null
   Object.assign(form, emptyForm())
+  selectedTagIds.value = []
   formError.value = ''
   showForm.value = true
 }
@@ -37,6 +50,7 @@ function openEdit(meal: Meal) {
     reference_calories: meal.reference_calories,
     reference_grams: meal.reference_grams,
   })
+  selectedTagIds.value = meal.tags.map(t => t.id)
   formError.value = ''
   showForm.value = true
 }
@@ -61,8 +75,9 @@ async function submitForm() {
     const payload = {
       name: form.name.trim(),
       calorie_type: form.calorie_type,
-      reference_calories: form.reference_calories,
+      reference_calories: form.reference_calories!,
       reference_grams: form.calorie_type === 'per_gram' ? form.reference_grams : null,
+      tag_ids: selectedTagIds.value,
     }
     if (editingId.value) {
       await mealsStore.updateMeal(editingId.value, payload)
@@ -72,7 +87,7 @@ async function submitForm() {
     showForm.value = false
     editingId.value = null
   } catch (e) {
-    formError.value = e instanceof Error ? e.message : 'Failed to save meal'
+    formError.value = e instanceof Error ? e.message : 'Failed to save'
   } finally {
     submitting.value = false
   }
@@ -87,19 +102,33 @@ async function deleteMeal(id: string, name: string) {
   }
 }
 
-onMounted(() => mealsStore.fetchMeals())
+onMounted(() => Promise.all([mealsStore.fetchMeals(), tagsStore.fetchTags()]))
 </script>
 
 <template>
   <div class="page">
     <div class="page-header">
-      <h1 class="page-title">My Meals</h1>
-      <button class="btn btn-primary" @click="openCreate">+ Add meal</button>
+      <h1 class="page-title">Food</h1>
+      <button class="btn btn-primary" @click="openCreate">+ Add item</button>
     </div>
 
-    <!-- Meal form -->
+    <!-- Tag filter pills -->
+    <div v-if="tagsStore.tags.length" class="tag-filter">
+      <button
+        :class="['tag-pill', activeTagId === null && 'active']"
+        @click="activeTagId = null"
+      >All</button>
+      <button
+        v-for="tag in tagsStore.tags"
+        :key="tag.id"
+        :class="['tag-pill', activeTagId === tag.id && 'active']"
+        @click="activeTagId = activeTagId === tag.id ? null : tag.id"
+      >{{ tag.name }}</button>
+    </div>
+
+    <!-- Food item form -->
     <div v-if="showForm" class="card">
-      <h2>{{ editingId ? 'Edit meal' : 'New meal' }}</h2>
+      <h2>{{ editingId ? 'Edit item' : 'New item' }}</h2>
       <form @submit.prevent="submitForm">
         <div class="field">
           <label for="meal-name">Name</label>
@@ -123,14 +152,7 @@ onMounted(() => mealsStore.fetchMeals())
         <template v-if="form.calorie_type === 'flat'">
           <div class="field">
             <label for="flat-cal">Calories</label>
-            <input
-              id="flat-cal"
-              v-model.number="form.reference_calories"
-              type="number"
-              min="1"
-              step="1"
-              placeholder="e.g. 350"
-            />
+            <input id="flat-cal" v-model.number="form.reference_calories" type="number" min="1" step="1" placeholder="e.g. 350" />
           </div>
         </template>
 
@@ -139,30 +161,27 @@ onMounted(() => mealsStore.fetchMeals())
           <div class="field-row">
             <div class="field">
               <label for="pg-cal">Calories</label>
-              <input
-                id="pg-cal"
-                v-model.number="form.reference_calories"
-                type="number"
-                min="1"
-                step="any"
-                placeholder="e.g. 200"
-              />
+              <input id="pg-cal" v-model.number="form.reference_calories" type="number" min="1" step="any" placeholder="e.g. 200" />
             </div>
             <span class="field-row-sep">for</span>
             <div class="field">
               <label for="pg-grams">Grams</label>
-              <input
-                id="pg-grams"
-                v-model.number="form.reference_grams"
-                type="number"
-                min="0.1"
-                step="any"
-                placeholder="e.g. 123"
-              />
+              <input id="pg-grams" v-model.number="form.reference_grams" type="number" min="0.1" step="any" placeholder="e.g. 123" />
             </div>
             <span class="field-row-sep">g</span>
           </div>
         </template>
+
+        <!-- Tags -->
+        <div v-if="tagsStore.tags.length" class="field">
+          <label>Tags</label>
+          <div class="checkbox-group">
+            <label v-for="tag in tagsStore.tags" :key="tag.id" class="checkbox-label">
+              <input type="checkbox" :value="tag.id" v-model="selectedTagIds" />
+              {{ tag.name }}
+            </label>
+          </div>
+        </div>
 
         <p v-if="formError" class="form-error">{{ formError }}</p>
 
@@ -175,23 +194,22 @@ onMounted(() => mealsStore.fetchMeals())
       </form>
     </div>
 
-    <!-- Meals list -->
+    <!-- Food list -->
     <div v-if="mealsStore.loading" class="muted">Loading...</div>
-    <div v-else-if="mealsStore.meals.length === 0 && !showForm" class="card muted">
-      No meals yet. Add one above.
+    <div v-else-if="filteredMeals.length === 0 && !showForm" class="card muted">
+      {{ mealsStore.meals.length === 0 ? 'No items yet. Add one above.' : 'No items match this tag.' }}
     </div>
     <ul v-else class="meal-list">
-      <li v-for="meal in mealsStore.meals" :key="meal.id" class="meal-item card">
+      <li v-for="meal in filteredMeals" :key="meal.id" class="meal-item card">
         <div class="meal-info">
           <span class="meal-name">{{ meal.name }}</span>
           <span class="meal-detail muted">
-            <template v-if="meal.calorie_type === 'flat'">
-              {{ meal.reference_calories }} cal flat
-            </template>
-            <template v-else>
-              {{ meal.reference_calories }} cal / {{ meal.reference_grams }}g
-            </template>
+            <template v-if="meal.calorie_type === 'flat'">{{ meal.reference_calories }} cal flat</template>
+            <template v-else>{{ meal.reference_calories }} cal / {{ meal.reference_grams }}g</template>
           </span>
+          <div v-if="meal.tags.length" class="tag-badges">
+            <span v-for="tag in meal.tags" :key="tag.id" class="tag-badge">{{ tag.name }}</span>
+          </div>
         </div>
         <div class="meal-actions">
           <button class="btn btn-secondary btn-sm" @click="openEdit(meal)">Edit</button>

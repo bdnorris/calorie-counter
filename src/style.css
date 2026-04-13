@@ -393,6 +393,77 @@ main.with-nav { padding-top: 56px; }
 .danger-zone h2 { color: var(--color-danger); }
 .danger-zone p { margin-bottom: 14px; }
 
+/* ── Tags ────────────────────────────────────────────────── */
+
+/* Filter pills (food list top bar) */
+.tag-filter { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.tag-pill {
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-muted);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s;
+  font-family: inherit;
+}
+.tag-pill:hover { background: var(--color-bg); color: var(--color-text); }
+.tag-pill.active { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+
+/* Badges on meal cards */
+.tag-badges { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+
+.tag-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #e8f5ee;
+  color: var(--color-primary);
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Form checkboxes */
+.checkbox-group { display: flex; flex-wrap: wrap; gap: 10px 20px; }
+.checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; cursor: pointer; }
+.checkbox-label input[type="checkbox"] { accent-color: var(--color-primary); width: 15px; height: 15px; }
+
+/* Settings tag management */
+.tag-manage-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+
+.tag-manage-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  background: var(--color-bg);
+}
+
+.tag-add-form {
+  display: flex;
+  gap: 8px;
+}
+
+.tag-add-form input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+  font-family: inherit;
+}
+.tag-add-form input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(44,122,75,.15);
+}
+
 /* ── Utilities ───────────────────────────────────────────── */
 .muted { color: var(--color-muted); font-size: 0.875rem; }
 

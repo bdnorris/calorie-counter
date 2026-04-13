@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { Meal } from '@/types'
+import type { Meal, MealInput } from '@/types'
 import { api } from '@/lib/api'
 
 export const useMealsStore = defineStore('meals', () => {
@@ -22,8 +22,8 @@ export const useMealsStore = defineStore('meals', () => {
     }
   }
 
-  async function createMeal(data: Omit<Meal, 'id' | 'user_id' | 'created_at'>) {
-    const res = await api.post('/api/meals', data)
+  async function createMeal(input: MealInput) {
+    const res = await api.post('/api/meals', input)
     if (!res.ok) {
       const body = await res.json()
       throw new Error(body.error ?? 'Failed to create meal')
@@ -34,8 +34,8 @@ export const useMealsStore = defineStore('meals', () => {
     return meal
   }
 
-  async function updateMeal(id: string, data: Omit<Meal, 'id' | 'user_id' | 'created_at'>) {
-    const res = await api.put(`/api/meals/${id}`, data)
+  async function updateMeal(id: string, input: MealInput) {
+    const res = await api.put(`/api/meals/${id}`, input)
     if (!res.ok) {
       const body = await res.json()
       throw new Error(body.error ?? 'Failed to update meal')

@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import LoginView from '@/views/LoginView.vue'
 import TodayView from '@/views/TodayView.vue'
-import MealsView from '@/views/MealsView.vue'
+import FoodView from '@/views/FoodView.vue'
 import HistoryView from '@/views/HistoryView.vue'
 import SettingsView from '@/views/SettingsView.vue'
 
@@ -11,7 +11,7 @@ const router = createRouter({
   routes: [
     { path: '/login', component: LoginView, meta: { public: true } },
     { path: '/', component: TodayView },
-    { path: '/meals', component: MealsView },
+    { path: '/food', component: FoodView },
     { path: '/history', component: HistoryView },
     { path: '/settings', component: SettingsView },
   ],

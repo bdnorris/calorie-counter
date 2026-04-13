@@ -4,6 +4,13 @@ export interface Profile {
   created_at: string
 }
 
+export interface Tag {
+  id: string
+  user_id: string
+  name: string
+  created_at: string
+}
+
 export interface Meal {
   id: string
   user_id: string
@@ -11,7 +18,16 @@ export interface Meal {
   calorie_type: 'per_gram' | 'flat'
   reference_calories: number
   reference_grams: number | null
+  tags: Tag[]
   created_at: string
+}
+
+export interface MealInput {
+  name: string
+  calorie_type: 'per_gram' | 'flat'
+  reference_calories: number
+  reference_grams: number | null
+  tag_ids: string[]
 }
 
 export interface LogEntry {
