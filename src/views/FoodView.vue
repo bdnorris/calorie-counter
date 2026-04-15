@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
+import { ref, reactive, computed, nextTick, onMounted } from 'vue'
 import Fuse from 'fuse.js'
 import { useMealsStore } from '@/stores/meals'
 import { useTagsStore } from '@/stores/tags'
@@ -59,6 +59,11 @@ const form = reactive<MealForm>(emptyForm())
 const selectedTagIds = ref<string[]>([])
 const formError = ref('')
 const submitting = ref(false)
+const formCard = ref<HTMLElement | null>(null)
+
+function scrollToForm() {
+  nextTick(() => formCard.value?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+}
 
 function openCreate() {
   editingId.value = null
@@ -66,6 +71,7 @@ function openCreate() {
   selectedTagIds.value = []
   formError.value = ''
   showForm.value = true
+  scrollToForm()
 }
 
 function openEdit(meal: Meal) {
@@ -76,9 +82,10 @@ function openEdit(meal: Meal) {
     reference_calories: meal.reference_calories,
     reference_grams: meal.reference_grams,
   })
-  selectedTagIds.value = meal.tags.map(t => t.id)
+  selectedTagIds.value = meal.tags.map(({ id }) => id)
   formError.value = ''
   showForm.value = true
+  scrollToForm()
 }
 
 function cancelForm() {
@@ -164,7 +171,7 @@ onMounted(() => Promise.all([mealsStore.fetchMeals(), tagsStore.fetchTags()]))
     </div>
 
     <!-- Food item form -->
-    <div v-if="showForm" class="card">
+    <div v-if="showForm" ref="formCard" class="card">
       <h2>{{ editingId ? 'Edit item' : 'New item' }}</h2>
       <form @submit.prevent="submitForm">
         <div class="field">
